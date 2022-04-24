@@ -41,12 +41,7 @@ const buttonStyle = {
     // backgroundColor:"palegreen",
 }
 
-const socket = io(process.env.REACT_APP_SOCKETIO_URL);
-// socket.on("changeLineWidth", function(value){
-//     // console.log("======")
-//     console.log(value)
-// })
-
+// const socket = io(process.env.REACT_APP_SOCKETIO_URL);
 
 const Create = ({setCurrentRoomId, setRoomInfo}) =>{
     const [mode, setMode] = useState("general");
@@ -54,21 +49,19 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
     const [playerCount, setPlayerCount] = useState(5);
     const [score, setScore] = useState(70);
 
-    // const navigate = useNavigate();
-    // async function createRoom(){
-    //     // socket.emit("createRoom", {mode, theme, playerCount, score})
-        
-    //     let resData = await axios.post("http://localhost:3000/api/1.0/", {mode, theme, playerCount, score})
-    //     let roomInfo = resData.data; 
-    //     setCurrentRoomId(roomInfo.roomId);
-    //     setRoomInfo(roomInfo);
+    const navigate = useNavigate();
+    async function createRoom(){
+        let resData = await axios.post("http://localhost:3000/api/1.0/", {mode, theme, playerCount, score})
+        let roomInfo = resData.data; 
+        setCurrentRoomId(roomInfo.roomId);
+        setRoomInfo(roomInfo);
 
-    //     navigate(`/game/${roomInfo.roomId}`)
-    // }
+        navigate(`/game/${roomInfo.roomId}`)
+    }
 
-    // useEffect(() => {
-    //     console.log("changeSetting")
-    // },[mode, theme, playerCount, score])
+    useEffect(() => {
+        console.log("changeSetting")
+    },[mode, theme, playerCount, score])
 
     return (
         <div style={frameStyle} className="frame_border" >
@@ -117,7 +110,7 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
             </div>
 
             <div style={divFlexStyle}>
-                {/* <Link to={"/game/"+"abc"} > */}
+                {/* <Link to={"/game/"+"roomId"} > */}
                     <button onClick={createRoom} className="component_border" style={buttonStyle}>開始遊戲</button>
                 {/* </Link> */}
             </div>
