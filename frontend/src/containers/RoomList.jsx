@@ -58,22 +58,22 @@ const RoomList = () =>{
     let [config, setConfig] = useState({})
 
     
-    // useEffect(() =>{
-    //     async function getRoomList(){
-    //         let resData = await axios.get("http://localhost:3000/api/1.0/rooms");
-    //         console.log("roomList: ", resData.data);
-    //         setRoomList(resData.data);
-    //     }
-    //     getRoomList();
-    //     // socket.on("createRoom", (value) => {
-    //     //     console.log(value)
-    //     //     setConfig(value)
-    //     // })
+    useEffect(() =>{
+        async function getRoomList(){
+            let resData = await axios.get("http://localhost:3000/api/1.0/rooms");
+            console.log("roomList: ", resData.data);
+            setRoomList(resData.data);
+        }
+        getRoomList();
+        // socket.on("createRoom", (value) => {
+        //     console.log(value)
+        //     setConfig(value)
+        // })
 
-    //     // return () => {
-    //     //     socket.off("createRoom")
-    //     // }
-    // },[])
+        // return () => {
+        //     socket.off("createRoom")
+        // }
+    },[])
 
     // useEffect(() => {
     //     let a = [...roomList]
