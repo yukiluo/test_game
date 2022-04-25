@@ -1,7 +1,7 @@
-import '../index.css'
-import{BrowserRouter, Routes, Route, Link, useNavigate} from 'react-router-dom'
+import '../index.css';
+import{BrowserRouter, Routes, Route, Link, useNavigate} from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client'
+import io from 'socket.io-client';
 import axios from 'axios';
 
 
@@ -51,7 +51,7 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
 
     const navigate = useNavigate();
     async function createRoom(){
-        let resData = await axios.post("http://localhost:3000/api/1.0/", {mode, theme, playerCount, score})
+        let resData = await axios.post("http://localhost:3000/api/1.0/room", {mode, theme, playerCount, score})
         let roomInfo = resData.data; 
         setCurrentRoomId(roomInfo.roomId);
         setRoomInfo(roomInfo);
