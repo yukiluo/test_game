@@ -59,13 +59,13 @@ const Room = ({room,  setCurrentRoomId, roomBorder}) => {
     const [isHover, setIsHover] = useState(true);
     const [isChoise, setIsChoise] = useState(false);
 
-    // useEffect(() => {
-    //     resetBorder()
-    // },[roomBorder])
+    useEffect(() => {
+        resetBorder()
+    },[roomBorder])
 
-    // useEffect(() => {
-    //     setIsHover(false);
-    // },[isChoise])
+    useEffect(() => {
+        setIsHover(false);
+    },[isChoise])
     
     const roomStyle = {
         width:"23%",
@@ -74,30 +74,30 @@ const Room = ({room,  setCurrentRoomId, roomBorder}) => {
         borderColor: borderColor,
         borderWidth: borderWidth,
     }
-    // function resetBorder(){
-    //     setBorderColor(roomBorder.color);
-    //     setBorderWidth(roomBorder.width);
-    //     setIsHover(true);
-    // }
+    function resetBorder(){
+        setBorderColor(roomBorder.color);
+        setBorderWidth(roomBorder.width);
+        setIsHover(true);
+    }
 
-    // function onMouseMove(e){
-    //     if(isHover){
-    //         setBorderColor("yellow");
-    //         setBorderWidth("5px");
-    //     }
-    // }
-    // function onMouseOut(e){
-    //     if(isHover){
-    //         resetBorder();
-    //     }
-    // }
-    // function onMouseUp(e){
-    //     setCurrentRoomId(room.roomId)
-    //     setIsChoise(!isChoise);
-    // }
+    function onMouseMove(e){
+        if(isHover){
+            setBorderColor("yellow");
+            setBorderWidth("5px");
+        }
+    }
+    function onMouseOut(e){
+        if(isHover){
+            resetBorder();
+        }
+    }
+    function onMouseUp(e){
+        setCurrentRoomId(room.roomId)
+        setIsChoise(!isChoise);
+    }
 
     return(
-        <div  className="component_border" style={roomStyle}>
+        <div onMouseUp={onMouseUp} onMouseMove={onMouseMove} onMouseOut={onMouseOut} className="component_border" style={roomStyle}>
             <img src={require("../../img/general.gif")} alt="" style={roomImgStyle}/>
             <div style={divFlexStyle}>
                 <div style={roomInfoStyle}>{modeTranslate(room.mode)}</div>
