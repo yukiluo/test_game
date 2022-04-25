@@ -41,7 +41,7 @@ const buttonStyle = {
     // backgroundColor:"palegreen",
 }
 
-// const socket = io(process.env.REACT_APP_SOCKETIO_URL);
+const socket = io(process.env.REACT_APP_SOCKETIO_URL);
 
 const Create = ({setCurrentRoomId, setRoomInfo}) =>{
     const [mode, setMode] = useState("general");
@@ -56,9 +56,11 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
         setCurrentRoomId(roomInfo.roomId);
         setRoomInfo(roomInfo);
 
+        socket.emit("createRoom", roomInfo);
+        console.log(`createRoom: ${roomInfo.roomId}`)
         navigate(`/game/${roomInfo.roomId}`)
     }
-
+    
     useEffect(() => {
         console.log("changeSetting")
     },[mode, theme, playerLimit, score])

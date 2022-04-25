@@ -54,25 +54,37 @@ const socket = io(process.env.REACT_APP_SOCKETIO_URL);
 const RoomList = () =>{
     const [roomList, setRoomList] = useState([]);
     const [currentRoomId, setCurrentRoomId] = useState("");
-    const [allChange, setAllChange] = useState(true);
-    let [config, setConfig] = useState({})
-
+    const [config, setConfig] = useState({})
     
     useEffect(() =>{
+        //先取得全部房間
         async function getRoomList(){
             let resData = await axios.get("http://localhost:3000/api/1.0/rooms");
             console.log("roomList: ", resData.data);
             setRoomList(resData.data);
         }
         getRoomList();
-        // socket.on("createRoom", (value) => {
-        //     console.log(value)
-        //     setConfig(value)
-        // })
 
-        // return () => {
-        //     socket.off("createRoom")
-        // }
+        //監聽createRoom 更新roomList
+        socket.on("createRoom", (room) => {
+            console.log(`socket on createRoom: `, room.roomId)
+            
+            //這樣不行??
+            // let newRoomList = [...roomList];
+            // newRoomList.push(room);
+            // setRoomList(newRoomList)
+            
+            //這樣不行??
+            // setRoomList([...roomList, room]);
+
+            setRoomList((pre) =>{
+                return [...pre, room]
+            })
+        })
+
+        return () => {
+            socket.off("createRoom")
+        }
     },[])
 
     // useEffect(() => {
