@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const redisClient =  require("../util/redis");
-const ROOM_EXPIRE = 60 * 5;  //先設置5分鐘房間會被銷毀
+const ROOM_EXPIRE = 60 * 15;  //先設置5分鐘房間會被銷毀
 const ROOM_PREFIX = "room--"
 
 // await client.set('key', JSON.stringify(camp));
@@ -11,14 +11,15 @@ let roomMap = {} ////
 const createRoom =  async (req, res) => {
     let config = req.body;
     let roomId = uuidv4()
-    roomMap[roomId] = {...config, roomId} ////
+    roomMap[roomId] = {...config, roomId, playerCount:1} ////
 
-    await redisClient.set((ROOM_PREFIX + roomId), JSON.stringify({...config, roomId}));
-    redisClient.expire(roomId, ROOM_EXPIRE)
+    let roomKey = ROOM_PREFIX + roomId;
+    await redisClient.set(roomKey, JSON.stringify({...config, roomId, playerCount:1}));
+    redisClient.expire(roomKey, ROOM_EXPIRE)
     
-    console.log("createRoom: ",{...config, roomId}, )
+    console.log("createRoom: ",{...config, roomId, playerCount:1}, )
       
-    res.status(200).send({...config, roomId}) ; 
+    res.status(200).send({...config, roomId, playerCount:1}) ; 
 }
 
 const getRoom =  async (req, res) => {
@@ -31,16 +32,31 @@ const getRoom =  async (req, res) => {
     }
     let roomInfo = roomMap[roomId] ////
     room = JSON.parse(room)
-    console.log("getRoom: ", aaa);
-    res.status(200).send(room) ; 
+    console.log("getRoom: ", room);
+    res.status(200).send(room); 
 }
 
+const getRandomRoom =  async (req, res) => {
+    let allRoomKeys = await redisClient.keys(ROOM_PREFIX+"*");
+    console.log(allRoomKeys);
 
-// let aaa = await redisClient.keys(ROOM_PREFIX+"*")
+    for(roomKey of allRoomKeys){
+        let room = await redisClient.get(roomKey);
+        room = JSON.parse(room);
+        if(room.playerCount < room.playerLimit){
+            console.log("getRandomRoom: ", room)
+            res.status(200).send(room);
+            return
+        }
+    }
+    res.status(400).send("rooms all full");
+}
+
 
 
 
 module.exports = {
     createRoom,
-    getRoom
+    getRoom,
+    getRandomRoom
 };
