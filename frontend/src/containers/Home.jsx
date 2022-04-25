@@ -55,18 +55,24 @@ const Home = ({setUserName, setUserId}) =>{
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // const navigate = useNavigate();
-    async function getUserId(){
+    const navigate = useNavigate();
+    async function getUserIdAndJoinGame(){
         if(tmpUserName == ""){
-            alert("請輸入暱稱")
+            alert("請輸入暱稱");
             return
         }
-        let resData = await axios.get("http://localhost:3000/api/1.0/user/userId")
+        let resData = await axios.get("http://localhost:3000/api/1.0/user/userId");
         let user = resData.data;
-
         setUserName(tmpUserName);
         setUserId(user.userId + "-" + tmpUserName);
-        // navigate("/game/123");
+        
+        try{
+            let roomData = await axios.get("http://localhost:3000/api/1.0/room/random");
+            navigate(`/game/${roomData.data.roomId}`);
+        }catch(err){
+            console.log("game page: ", err.response.data);
+            alert("房間已滿， \r\n請稍等一下或建立新房間。")
+        }
     }
     
 
@@ -89,7 +95,7 @@ const Home = ({setUserName, setUserId}) =>{
                             <button  className="component_border" style={buttonStyle}>房間</button>
                         </Link>
                         {/* <Link to="/game"> */}
-                            <button  className="component_border" style={buttonStyle} onClick={getUserId} >快速加入</button>
+                            <button  className="component_border" style={buttonStyle} onClick={getUserIdAndJoinGame} >快速加入</button>
                         {/* </Link> */}
                     </div>                    
                 </div>
