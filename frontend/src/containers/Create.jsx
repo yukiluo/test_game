@@ -46,12 +46,12 @@ const buttonStyle = {
 const Create = ({setCurrentRoomId, setRoomInfo}) =>{
     const [mode, setMode] = useState("general");
     const [theme, setTheme] = useState("general");
-    const [playerCount, setPlayerCount] = useState(5);
+    const [playerLimit, setPlayerLimit] = useState(5);
     const [score, setScore] = useState(70);
 
     const navigate = useNavigate();
     async function createRoom(){
-        let resData = await axios.post("http://localhost:3000/api/1.0/room", {mode, theme, playerCount, score})
+        let resData = await axios.post("http://localhost:3000/api/1.0/room", {mode, theme, playerLimit, score})
         let roomInfo = resData.data; 
         setCurrentRoomId(roomInfo.roomId);
         setRoomInfo(roomInfo);
@@ -61,7 +61,7 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
 
     useEffect(() => {
         console.log("changeSetting")
-    },[mode, theme, playerCount, score])
+    },[mode, theme, playerLimit, score])
 
     return (
         <div style={frameStyle} className="frame_border" >
@@ -86,7 +86,7 @@ const Create = ({setCurrentRoomId, setRoomInfo}) =>{
             </div>
             <div style={divFlexStyle}>
                 <label style={lebelStyle}>人數上限</label>
-                <select  style={inputStyle} className="component_border" onChange={(e)=>setPlayerCount(e.target.value)}>
+                <select  style={inputStyle} className="component_border" onChange={(e)=>setPlayerLimit(e.target.value)}>
                     <option value="5">5</option>
                     <option value="6">6</option>
                     <option value="7">7</option>
