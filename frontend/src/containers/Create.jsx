@@ -43,7 +43,7 @@ const buttonStyle = {
 
 const socket = io(process.env.REACT_APP_SOCKETIO_URL);
 
-const Create = ({setCurrentRoomId, setRoomInfo}) =>{
+const Create = ({setCurrentRoomId, setRoomInfo, }) =>{
     const [mode, setMode] = useState("general");
     const [theme, setTheme] = useState("general");
     const [playerLimit, setPlayerLimit] = useState(5);

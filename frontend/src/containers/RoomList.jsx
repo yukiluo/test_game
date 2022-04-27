@@ -1,5 +1,5 @@
 import '../index.css';
-import{BrowserRouter, Routes, Route, Link} from 'react-router-dom';
+import{BrowserRouter, Routes, Route, Link, useNavigate} from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
@@ -49,57 +49,98 @@ const roomImgStyle = {
     display:"block"
 }
 
-const socket = io(process.env.REACT_APP_SOCKETIO_URL);
+// const socket = io(process.env.REACT_APP_SOCKETIO_URL);
 
-const RoomList = () =>{
+const RoomList = ({socket}) =>{
     const [roomList, setRoomList] = useState([]);
     const [currentRoomId, setCurrentRoomId] = useState("");
-    const [config, setConfig] = useState({})
-    
-    useEffect(() =>{
-        //先取得全部房間
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // 先取得全部房間
         async function getRoomList(){
             let resData = await axios.get("http://localhost:3000/api/1.0/rooms");
             console.log("roomList: ", resData.data);
             setRoomList(resData.data);
         }
         getRoomList();
+    },[])
 
+    useEffect(() =>{
         //監聽createRoom 更新roomList
         socket.on("createRoom", (room) => {
             console.log(`socket on createRoom: `, room.roomId)
             
-            //這樣不行??
-            // let newRoomList = [...roomList];
-            // newRoomList.push(room);
-            // setRoomList(newRoomList)
-            
-            //這樣不行??
+            //這樣不行?? //底下[]有放roomList就行了
             // setRoomList([...roomList, room]);
-
-            setRoomList((pre) =>{
+            setRoomList((pre) => {
                 return [...pre, room]
             })
         })
 
+        socket.on("joinGame", (room) => {
+            //底下[]有放roomList就能run了
+            // let newRoomList = [...roomList]
+            console.log(`socket on joinGame: `, room)
+            let newRoomList = JSON.parse(JSON.stringify(roomList));
+            for(let newRoom of newRoomList){
+                if(newRoom.roomId == room.roomId && newRoom.playerCount < newRoom.playerLimit){
+                    newRoom.playerCount = room.playerCount;
+                    break;
+                }
+            }
+            setRoomList(newRoomList)
+
+            // setRoomList((pre) => {
+            //     // let newRoomList = JSON.parse(JSON.stringify(pre));
+            //    let newRoomList = [...pre]
+            //     for(let newRoom of newRoomList){
+            //         if(newRoom.roomId == room.roomId && newRoom.playerCount < newRoom.playerLimit){
+            //             newRoom.playerCount++;
+            //             break;
+            //         }
+            //     }
+            //     return newRoomList;
+            // })
+        })
+
+        socket.on("leaveGame", (room) => {
+            console.log(`socket on leaveGame: `, room.roomId)
+            let newRoomList = JSON.parse(JSON.stringify(roomList));
+            for(let newRoom of newRoomList){
+                if(newRoom.roomId == room.roomId && newRoom.playerCount > 1){
+                    newRoom.playerCount--;
+                    break;
+                }
+            }
+            setRoomList(newRoomList)
+        })
+
         return () => {
-            socket.off("createRoom")
+            socket.off("createRoom");
+            socket.off("joinGame");
+            socket.off("leaveGame");
         }
-    },[])
+    },[roomList])
 
-    // useEffect(() => {
-    //     let a = [...roomList]
-    //     a.push(config)
-    //     setRoomList(a)
-    //     console.log(roomList)
-    // },[config])
+    function joinGame(){
+        let gameRoom = roomList.find((room, i) => {
+            return room.roomId == currentRoomId;
+        })
 
-    // useEffect(() => {
-    //     console.log("bbbbbb")
-    //     console.log(roomList)
-    // },[roomList])
+        if(!gameRoom){
+            alert("此房間已不在");
+            return;
+        }
 
-    
+        if(gameRoom.playerCount >= gameRoom.playerLimit ){
+            alert("人數已滿");
+            return;
+        }
+
+        navigate(`/game/${currentRoomId}`)
+    }
+
     return (
         <div style={frameStyle} className="frame_border">
             <div style={{textAlign:"center", fontSize:"40px", margin:"10px auto 0px"}}>Rooms</div>
@@ -111,16 +152,15 @@ const RoomList = () =>{
                         key={room.roomId} 
                         room={room}></Room> 
                 })}
-                
             </div>
             
             <div style={divFlexStyle}>
                 <Link to="/create">
                     <button className="component_border" style={buttonStyle}>創立房間</button>
                 </Link>
-                <Link to="/game">
-                    <button className="component_border" style={buttonStyle}>加入房間</button>
-                </Link>
+                {/* <Link to="/game"> */}
+                    <button onClick={joinGame} className="component_border" style={buttonStyle}>加入房間</button>
+                {/* </Link> */}
             </div>
 
             
