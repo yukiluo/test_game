@@ -2,22 +2,30 @@ import '../index.css';
 import{BrowserRouter, Routes, Route, Link, useNavigate} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
+import 'wired-elements';
+import '../css/wierd.css';
+import { MdEdit } from "react-icons/md";
 
 const frameStyle = {
-    width:"70%",
+    width:"80%",
+    minWidth: "600px",
     height:"500px",
-    margin:"50px auto",
-    backgroundColor:"palegreen",
+    // margin:"50px auto",
+    // backgroundColor:"palegreen",
 }
+
 const innerBoxStyle = {
     width:"50%",
     margin:"100px auto 10px",
+    padding:"10px",
     // backgroundColor:"palegreen",
 }
 const divFlexStyle = {
+    width: "100%",
     display: "flex",
     justifyContent: "center", 
     alignItems:"center",
+    marginBottom: "10px",
     // marginTop: "20px",
 }
 const stick = {
@@ -29,43 +37,56 @@ const stick = {
     marginTop: "100px",
     boxSizing: "border-box"
 }
-const lebelStyle = {
-    width:"20%",
-    textAlign:"center"
+const labelStyle = {
+    // width:"20%",
+    textAlign:"center",
+    width: "30%",
+    marginRight: "10px",
 }
 const inputStyle = {
-    width:"200px",
+    width: "50%",
     height:"40px",
-    margin:"10px 10px",
+    // margin:"10px 10px",
     fontSize:"20px",
+    textAlign:"center",
     // backgroundColor:"palegreen",
 }
 const buttonStyle = {
-    width:"150px",
+    // minWidth: "90px",
+    // width: "50%",
     height:"40px",
     margin:"10px 10px",
     boxSizing:"content-box",
     bottom: "10px",
     cursor: "pointer",
     // backgroundColor:"palegreen",
+    //
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textDecoration: "none",
+    color: "black",
 }
 
-const Home = ({setUserName, setUserId}) =>{
-    const [tmpUserName, setTmpUserName] = useState("");
+const Home = ({setUser}) =>{
+    const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const navigate = useNavigate();
-    async function getUserIdAndJoinGame(){
-        if(tmpUserName == ""){
+
+    async function getUserIdAndSetUser(){
+        let resData = await axios.get("http://localhost:3000/api/1.0/user/userId");
+        let userId = resData.data.userId  + "-" + userName;
+        let user = {userId, userName, email, password};
+        setUser(user);
+    }
+
+    async function joinGame(){
+        if(userName == ""){
             alert("請輸入暱稱");
             return
         }
-        let resData = await axios.get("http://localhost:3000/api/1.0/user/userId");
-        let user = resData.data;
-        setUserName(tmpUserName);
-        setUserId(user.userId + "-" + tmpUserName);
-        
+        await getUserIdAndSetUser();
         try{
             let roomData = await axios.get("http://localhost:3000/api/1.0/room/random");
             navigate(`/game/${roomData.data.roomId}`);
@@ -74,59 +95,78 @@ const Home = ({setUserName, setUserId}) =>{
             alert("房間已滿， \r\n請稍等一下或建立新房間。")
         }
     }
-    
 
+    async function goRoomList(){
+        if(userName == ""){
+            alert("請輸入暱稱");
+            return
+        }
+        await getUserIdAndSetUser();
+        navigate(`/rooms`);
+    }
     return(
-        <div className="frame_border" style={frameStyle}>
-            <div style={{textAlign:"center", fontSize:"40px"}}>Fun.io</div>
-
-
+        // <div className="frame_border" style={frameStyle}>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"}}>
+        <h1 style={{color:"#50514F", fontSize:"60px", textAlign:"center"}}>Fun.io</h1>
+        <wired-card elevation="5" style={frameStyle}>
             <div style={{display:"flex"}}>
                 <div style={innerBoxStyle}>
                     <div style={divFlexStyle}>
-                        <img src="https://avatars.dicebear.com/api/male/john.svg?mood[]=happy&mood[]=sad" style={{width:"100px", height:"100px", margin:"20px"}}></img>
+                        <wired-image style={{width:"150px", height:"150px", padding: "5px"}} src="https://avatars.dicebear.com/api/male/john.svg?mood[]=happy&mood[]=sad"></wired-image>
+                        {/* <img src="https://avatars.dicebear.com/api/male/john.svg?mood[]=happy&mood[]=sad" style={{width:"100px", height:"100px", margin:"20px"}}></img> */}
+                        <wired-icon-button style={{position:"relative",top:"-70px",left:"-20px"}}>
+                            <MdEdit className="edit-icon"/>
+                        </wired-icon-button>
                     </div>
                     <div style={divFlexStyle}>
-                        <label>暱稱 </label>
-                        <input className="component_border" type="text" style={inputStyle} onChange={(e)=>setTmpUserName(e.target.value)} />
+                        <label style={labelStyle}>暱稱 </label>
+                        {/* <wired-input style={inputStyle} type="text" onChange={(e)=>setUserName(e.target.value)} ></wired-input> */}
+                        <input style={inputStyle} className="wired-rendered" type="text" onChange={(e)=>setUserName(e.target.value)} />
                     </div>
                     <div style={divFlexStyle}>
-                        <Link to="/rooms">
-                            <button  className="component_border" style={buttonStyle}>房間</button>
-                        </Link>
+                        <wired-button elevation="5" style={buttonStyle}  onClick={goRoomList}>創建房間</wired-button>
+                        <wired-button elevation="5" style={buttonStyle}  onClick={joinGame}>快速加入</wired-button>
+                        {/* <Link to="/rooms"> */}
+                            {/* <button  className="component_border" style={buttonStyle} onClick={goRoomList}>創建房間</button> */}
+                        {/* </Link> */}
                         {/* <Link to="/game"> */}
-                            <button  className="component_border" style={buttonStyle} onClick={getUserIdAndJoinGame} >快速加入</button>
+                            {/* <button  className="component_border" style={buttonStyle} onClick={joinGame} >快速加入</button> */}
                         {/* </Link> */}
                     </div>                    
                 </div>
-
                 <div style={stick}></div>
-
                 <div style={innerBoxStyle}>
                     <div style={divFlexStyle} >
-                        <input  className="component_border" type="email" style={inputStyle}/>
+                        <label style={labelStyle}>name </label>
+                        {/* <wired-input placeholder="Enter Name" style={inputStyle}></wired-input> */}
+                        <input  className="wired-rendered" placeholder="Enter Name" type="email" style={inputStyle}/>
                     </div> 
                     <div style={divFlexStyle} >
-                        <label style={lebelStyle}>e-mail </label>
-                        <input  className="component_border" type="email" style={inputStyle} onChange={(e)=>setEmail(e.target.value)} />
+                        <label style={labelStyle}>e-mail </label>
+                        {/* <wired-input type="email" placeholder="Enter Email" style={inputStyle} onChange={(e)=>setEmail(e.target.value)}></wired-input> */}
+                        <input  className="wired-rendered" placeholder="Enter Email" type="email" style={inputStyle} onChange={(e)=>setEmail(e.target.value)} />
                     </div>
                     <div style={divFlexStyle} >
-                        <label style={lebelStyle} >password </label>
-                        <input  className="component_border" type="email" style={inputStyle} onChange={(e)=>setPassword(e.target.value)} />
+                        <label style={labelStyle} >password </label>
+                        {/* <wired-input type="password" placeholder="Enter Password" style={inputStyle} onChange={(e)=>setPassword(e.target.value)}></wired-input> */}
+                        <input  className="wired-rendered" placeholder="Enter Password" type="email" style={inputStyle} onChange={(e)=>setPassword(e.target.value)} />
                     </div> 
                     <div style={divFlexStyle}>
-                        <Link to="/rooms">
-                            <button className="component_border" style={buttonStyle}>sign in</button>
-                        </Link>
-                        <Link to="/rooms">
-                            <button className="component_border" style={buttonStyle}>sign up</button>
-                        </Link>
+                        <wired-button style={buttonStyle}>Sign in</wired-button>
+                        <wired-button style={buttonStyle}>Sign up</wired-button>
+                        {/* <Link className="component_border" style={buttonStyle} to="/rooms"> */}
+                            {/* Sign in */}
+                            {/* <button className="component_border" style={buttonStyle}>登入</button> */}
+                        {/* </Link> */}
+                        {/* <Link className="component_border" style={buttonStyle} to="/rooms"> */}
+                            {/* Sign up */}
+                            {/* <button className="component_border" style={buttonStyle}>註冊</button> */}
+                        {/* </Link> */}
                     </div>
                 </div>
-            </div>
-            
-        </div>
-               
+            </div>    
+        </wired-card>
+        </div>       
     )
 }
 
